@@ -36,7 +36,7 @@ sudo apt-get remove --purge snmpd snmp
 
 # Reinstall SNMP
 sudo apt-get update
-sudo apt-get install snmpd snmp
+sudo apt-get install snmpd snmp libsnmp-base snmp-mibs-downloader
 ````
 
 ### 5. configure snmp with v3 only
@@ -103,6 +103,13 @@ snmpwalk -v3 -l authPriv -u s_snmp -a SHA -A "F@bl35-Cl0ud5-5t@mp5" -x AES -X "F
 snmpwalk -v1 -c public localhost
 snmpwalk -v2c -c public localhost
 ````
+
+### important
+```
+- check firewall
+sudo ufw status
+```
+
 
 #### snmp user
 ````
