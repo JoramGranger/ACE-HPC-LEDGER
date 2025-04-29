@@ -44,32 +44,59 @@ sudo apt-get install snmpd snmp libsnmp-base snmp-mibs-downloader
 # Stop SNMP service before configuring
 sudo systemctl stop snmpd
 
-# Create a new configuration file
+# Create a new configuration files
+sudo mkdir -p /etc/snmp/snmpd.conf.d
 sudo mv /etc/snmp/snmpd.conf /etc/snmp/snmpd.conf.original
 sudo nano /etc/snmp/snmpd.conf
 ````
 ##### content for the new snmp.conf
 ````
-# Basic system information
+###########################################################################
+#
+# snmpd.conf
+# Configuration file for the Net-SNMP agent ('snmpd')
+#
+###########################################################################
+# SECTION: System Information Setup
+#
+
+# System location and contact information
 sysLocation    ACE Kampala
 sysContact     support@ace-bioinformatics.org
+
+# sysservices value
 sysServices    72
 
-# Agent configuration
+###########################################################################
+# SECTION: Agent Operating Mode
+#
+
+# Run as a master agent (AgentX)
 master  agentx
 
-# Listen only on localhost for security (change to your management IP if needed)
-agentaddress  udp:127.0.0.1:161
+# Listen on standard SNMP ports
+agentaddress  udp:161,udp6:[::1]:161
 
-# Explicitly disable SNMPv1 and SNMPv2c
-disableSnmpv1  yes
-disableSnmpv2c yes
+###########################################################################
+# SECTION: Access Control Setup
+#
 
-# Define a view for SNMPv3 access
+# Define views - limit to system information only
 view   systemonly  included   .1.3.6.1.2.1.1
 view   systemonly  included   .1.3.6.1.2.1.25.1
 
-# Include additional configuration files if needed
+# SNMPv1/SNMPv2c community access (disabled)
+#rocommunity  public default -V systemonly
+#rocommunity6 public default -V systemonly
+
+# SNMPv3 user access configuration
+# Note: User creation should be in /var/lib/snmp/snmpd.conf:
+# createUser s_snmp SHA-512 authpassphrase AES privpassphrase
+
+# Configure read-only access for SNMPv3 user with auth+privacy
+rouser s_snmp authpriv -V systemonly
+
+# Include additional configuration files
 includeDir /etc/snmp/snmpd.conf.d
 ````
 
@@ -109,44 +136,17 @@ snmpwalk -v2c -c public localhost
 - check firewall
 sudo ufw status
 ```
+```
+- if inactive
+# Enable the firewall
+sudo ufw enable
 
+# Allow SNMP on UDP port 161 (standard SNMP)
+sudo ufw allow 161/udp
 
-#### snmp user
-````
-name: s_snmp
-````
+# Allow SNMP on TCP port 161 (if needed)
+sudo ufw allow 161/tcp
 
-#### user
-
-````
-a. Ensure that ICER-Uganda backups are up to date
-
-b.  SSH into the linux servers using administrator credentials
-
-c. Uninstall SNMP  from all servers and remove the installation directory for SNMP
-yum remove net-snmp* OR apt remove net-snmp*
-sudo rm -r /etc/snmp/
-
-d. Re-install SNMP and its dependencies
-yum -y install net-snmp net-snmp-utils
-
-For Ubuntu/Debian
-apt install snmpd snmp libsnmp-dev -y
-
-e. Stop SNMP service
-systemctl  stop snmpd
-
-f. Configure SNMPv3 by setting the snmp user, authentication algorithm, encryption algorithm and Credentials.
-net-snmp-create-v3-user -ro -A XXXXXXXX -a SHA -X XXXXX -x AES s_snmp
-
-g. Start snmp service
-systemctl  start snmpd
-
-h. Test SNMPv3 connection
-snmpwalk -u s_snmp -A XXXXX -a SHA -X XXXXX -x AES -l authPriv 127.0.0.1 -v3
-
-
-9. Enable SNMP service
-systemctl  enable snmpd
-````
-
+# Verify the rules were added
+sudo ufw status
+```

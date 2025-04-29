@@ -1,0 +1,47 @@
+###########################################################################
+#
+# snmpd.conf
+# Configuration file for the Net-SNMP agent ('snmpd')
+#
+###########################################################################
+# SECTION: System Information Setup
+#
+
+# System location and contact information
+sysLocation    ACE Kampala
+sysContact     support@ace-bioinformatics.org
+
+# sysservices value
+sysServices    72
+
+###########################################################################
+# SECTION: Agent Operating Mode
+#
+
+# Run as a master agent (AgentX)
+master  agentx
+
+# Listen on standard SNMP ports
+agentaddress  udp:161,udp6:[::1]:161
+
+###########################################################################
+# SECTION: Access Control Setup
+#
+
+# Define views - limit to system information only
+view   systemonly  included   .1.3.6.1.2.1.1
+view   systemonly  included   .1.3.6.1.2.1.25.1
+
+# SNMPv1/SNMPv2c community access (disabled)
+#rocommunity  public default -V systemonly
+#rocommunity6 public default -V systemonly
+
+# SNMPv3 user access configuration
+# Note: User creation should be in /var/lib/snmp/snmpd.conf:
+# createUser s_snmp SHA-512 authpassphrase AES privpassphrase
+
+# Configure read-only access for SNMPv3 user with auth+privacy
+rouser s_snmp authpriv -V systemonly
+
+# Include additional configuration files
+includeDir /etc/snmp/snmpd.conf.d
