@@ -49,7 +49,7 @@ sudo mkdir -p /etc/snmp/snmpd.conf.d
 sudo mv /etc/snmp/snmpd.conf /etc/snmp/snmpd.conf.original
 sudo nano /etc/snmp/snmpd.conf
 ````
-##### content for the new snmp.conf
+##### content for the new snmpd.conf
 ````
 ###########################################################################
 #
@@ -100,21 +100,13 @@ rouser s_snmp authpriv -V systemonly
 includeDir /etc/snmp/snmpd.conf.d
 ````
 
-### 6. create an snmp user
+### 6. create an snmp user as per config
 ````
 # Create the SNMPv3 user with specified credentials
 sudo net-snmp-config --create-snmpv3-user -a "F@bl35-Cl0ud5-5t@mp5" -x "F@bl35-Cl0ud5-5t@mp5" -X AES -A SHA s_snmp
-
-# Add the user to the configuration file
-sudo nano /etc/snmp/snmpd.conf
-````
-##### content to be added to snmpd.conf
-````
-# SNMPv3 user access
-rouser s_snmp authpriv -V systemonly
 ````
 
-### 7. start and test snmpv3
+### 7. start and test snmpv3 on the host its self
 ````
 # Start the SNMP service
 sudo systemctl start snmpd
@@ -124,7 +116,7 @@ sudo systemctl enable snmpd
 snmpwalk -v3 -l authPriv -u s_snmp -a SHA -A "F@bl35-Cl0ud5-5t@mp5" -x AES -X "F@bl35-Cl0ud5-5t@mp5" localhost
 ````
 
-### 8. verify that snmp v1 and v2c are disabled
+### 8. verify that snmp v1 and v2c are disabled on the host itself
 ````
 # These should fail with timeout or authentication errors
 snmpwalk -v1 -c public localhost

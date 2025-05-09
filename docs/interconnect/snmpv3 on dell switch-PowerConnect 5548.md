@@ -1,0 +1,36 @@
+# enable snmpv3 on dell switch-PowerConnect 5548
+### 1. global parameters for snmpv3
+- navigate to system >> SNMP 
+- from the dropdwon, click global parameters
+--------------------------------------------------
+- check "use default"
+- set to "enable" for SNMP Notifications and Authentication Notification
+- click apply
+--------------------------------------------------
+- from the dropdown, click view settings
+- use default view
+--------------------------------------------------
+- from the dropdown, click Access Control
+- Add new entry
+- set Group Name: "snmp_v3-ace"
+- set Security Model: "SNMPv3"
+- set Security Level: "Authentication"
+- For Modify Access Control Operation, check Read, Write, Notify to "Default" as per the defined view.
+--------------------------------------------------
+- from dropdown, click User Security Model
+- click add
+- set User Name: "s_snmp"
+- Engine ID: check "Local"
+- Group Name: "snmp-v3-ace"
+- Authentication Method: "SHA Password"
+- Password: "your password"
+- apply
+----------------------------------------------------
+- from dropdown, click Notification Recipients
+- supported IP: IPv4
+- recipient IP: 
+- check SNMPv3
+- supply user name and security level
+### 2. verify snmp3
+- snmpwalk -v 3 -l authNoPriv -u <username> -a SHA -A <password> 10.35.1.11
+- note: the iDrac version doesnt support Authentication and Privacy, hence only the authentication password is supplied
