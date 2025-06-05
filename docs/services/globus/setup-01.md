@@ -13,3 +13,24 @@ sudo apt update
 sudo apt upgrade
 ```
 
+### 3. Install globus server package
+```
+sudo apt install globus-connect-server54
+```
+
+### 4. Install globus cli (optional)
+```
+# sudo apt update && sudo apt install -y python3-pip
+# python3 -m pip install --upgrade globus-cli
+```
+
+### 5. create the endpoint
+```
+globus-connect-server endpoint setup "ACE UGANDA HPC" \
+    --organization "African Center of Excellence in Bioinformatics - Uganda" \
+    --owner jkiyemba@ace.ac.ug \
+    --contact-email ace.ac.ug@gmail.com
+
+```
+
+

@@ -32,11 +32,19 @@ sudo cp -a /var/lib/snmp /root/snmp_backup_$(date +%Y%m%d)/
 sudo systemctl stop snmpd
 
 # Remove the current SNMP packages while keeping configuration files
+# ubuntu
 sudo apt-get remove --purge snmpd snmp
+# centos
+dnf remove net-snmp net-snmp-utils net-snmp-libs
 
 # Reinstall SNMP
+# ubuntu
 sudo apt-get update
 sudo apt-get install snmpd snmp libsnmp-base snmp-mibs-downloader
+# centos
+dnf install net-snmp net-snmp-utils
+# rocky
+sudo dnf install net-snmp-devel snmpd snmp libsnmp-base snmp-mibs-downloader
 ````
 
 ### 5. configure snmp with v3 only
@@ -105,6 +113,14 @@ includeDir /etc/snmp/snmpd.conf.d
 # Create the SNMPv3 user with specified credentials
 sudo net-snmp-config --create-snmpv3-user -a "F@bl35-Cl0ud5-5t@mp5" -x "F@bl35-Cl0ud5-5t@mp5" -X AES -A SHA s_snmp
 ````
+### or
+```
+sudo net-snmp-config --create-snmpv3-user \
+  -ro \
+  -A SHA -a 'F@bl35-Cl0ud5-5t@mp5' \
+  -X AES -x 'F@bl35-Cl0ud5-5t@mp5' \
+  s_snmp
+```
 
 ### 7. start and test snmpv3 on the host its self
 ````
